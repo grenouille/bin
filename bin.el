@@ -1,4 +1,4 @@
-;;; org-bin.el --- dto's org-mode configuration
+;;; bin.el --- dto's catch-all organizational system
 
 ;; Copyright (C) 2007  David O'Toole
 
@@ -36,16 +36,37 @@
 (add-to-list 'auto-mode-alist '("\\.org$" . org-mode))
 (add-to-list 'auto-mode-alist '("\\.org_archive$" . org-mode))
 
-;; I keep almost everything in one big org file.
+(defvar bin-folder (file-name-as-directory "~/org")
+  "The disk directory where bin pages go by default.
+See also `bin-other-pages'.")
 
-(defvar org-bin-file "~/org/bin.org")
+(defvar bin-file "~/org/bin.org")
+
+(defun bin-page-filename (name &optional archive-p)
+  "Return the filename of the page named NAME.
+A page is an org file covering one topic."
+  (let ((extension (if archive-p ".org_archive" ".org")))
+    (expand-file-name (concat name extension) bin-folder)))
+
+(defvar bin-pages nil "The list of current page names.")
+
+(defun bin-read-pages 
+
+(defun bin-complete-page-name ()
+  (completing-read bin-pages
+
+(defun bin-find-page (page &optional archive-p)
+  (find-file (bin-page-filename page)))
+  
+  
 
 ;; I open my bin file when I hit C-c g
 
 (defun bin ()
-  "Open the BIN file."
+  "Open the BIN file and move to the top of the buffer."
   (interactive)
-  (find-file org-bin-file))
+  (find-file bin-file)
+  (goto-char (point-min)))
 
 ;; Some basic keybindings.
 
@@ -61,11 +82,11 @@
 ;; Some projects need their own org files, but I still want them to
 ;; show up in my agenda.
 
-(defvar org-bin-other-files)
+(defvar bin-other-files)
 
-(setf org-bin-other-files (list "~/eon/eon.org"))
+(setf bin-other-files (list "~/eon/eon.org"))
 
-(setf org-agenda-files (cons org-bin-file org-bin-other-files))
+(setf org-agenda-files (cons bin-file bin-other-files))
 
 ;; When I'm using org to track issues in a project, I use these
 ;; keywords on a file-local basis: 
@@ -145,7 +166,7 @@
 
 ;; My preferences. These are less related to BIN, and more to my
 ;; particular setup. They are included here for completeness, and so
-;; that new org users can see a complete example org-bin
+;; that new org users can see a complete example bin
 ;; configuration.
 
 (setq org-return-follows-link t)
@@ -171,6 +192,6 @@
 (add-hook 'org-mode-hook (lambda ()
 			   (local-set-key [(control tab)] 'other-window)))
 
-(provide 'org-bin)
-;;; org-bin.el ends here
+(provide 'bin)
+;;; bin.el ends here
 
