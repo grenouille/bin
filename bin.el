@@ -20,7 +20,25 @@
 ;; the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
 ;; Boston, MA 02110-1301, USA.
 
-;;; Commentary:
+;;; Commentary: 
+
+;; The bin system organizes your life around "pages". Each page is an
+;; org-file about a particular topic, project, or person. All the
+;; pages go in your "bin folder" (by default, ~/org) and when queried
+;; for information on a topic "foo", the system looks for
+;; "~/org/foo.org". (You can specify that a topic's page is stored
+;; elswehere by customizing `org-other-pages'.) See also `bin-folder'.
+
+;; A default page called "the bin" is for incoming items that have not
+;; been archived or refiled to another page. If you are away from the
+;; computer where you run org-mode, you can use a sheet of paper and
+;; enter the items later. See `bin-file'.
+
+;; Some top-level headings in pages are handled specially, for example
+;; "* Appointments" and "* Tasks".
+
+;; Hotkeys and auto-completion speed up access to the bin and its
+;; pages, including a search tool.
 
 ;;; Code:
 
@@ -40,7 +58,10 @@
   "The disk directory where bin pages go by default.
 See also `bin-other-pages'.")
 
-(defvar bin-file "~/org/bin.org")
+(defvar bin-file "~/org/bin.org" 
+  "Filename of the bin file, a central location for incoming unfiled items.
+If you are away from the computer, you can use a piece of paper
+for this, and enter the items into org-mode later.")
 
 (defun bin-page-filename (name &optional archive-p)
   "Return the filename of the page named NAME.
@@ -48,9 +69,22 @@ A page is an org file covering one topic."
   (let ((extension (if archive-p ".org_archive" ".org")))
     (expand-file-name (concat name extension) bin-folder)))
 
-(defvar bin-pages nil "The list of current page names.")
+(defvar bin-pages '() "The list of current page names.")
 
-(defun bin-read-pages 
+(defvar bin-other-pages '() "Association list of pages stored outside the bin folder.
+Each entry is of the form: 
+
+  (PAGENAME . FILENAME)
+
+where both PAGENAME and FILENAME are strings. Example: 
+
+  (setf bin-other-pages
+        '((\"finance\" . \"~/finance/todo.org\")
+          (\"myproject\" . \"~/myproject/myproject.org\")))")
+
+(defun bin-read-pages ()
+  (setf bin-pages 
+	(
 
 (defun bin-complete-page-name ()
   (completing-read bin-pages
