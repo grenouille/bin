@@ -22,17 +22,20 @@
 
 ;;; Commentary: 
 
-;; The bin system organizes your life around "pages". Each page is an
+;; Org mode is great, but it presents the new problem of how to
+;; organize your org files.
+
+;; The BIN system builds your life around "pages". Each page is an
 ;; org-file about a particular topic, project, or person. All the
 ;; pages go in your "bin folder" (by default, ~/org) and when queried
 ;; for information on a topic "foo", the system looks for
 ;; "~/org/foo.org". (You can specify that a topic's page is stored
 ;; elswehere by customizing `org-other-pages'.) See also `bin-folder'.
 
-;; A default page called "the bin" is for incoming items that have not
-;; been archived or refiled to another page. If you are away from the
-;; computer where you run org-mode, you can use a sheet of paper and
-;; enter the items later. See `bin-file'.
+;; A default page called "the bin" (i.e. ~/org/bin.org) is for
+;; incoming items that have not been archived or refiled to another
+;; page. If you are away from the computer where you run org-mode, you
+;; can use a sheet of paper and enter the items later. See `bin-file'.
 
 ;; Some top-level headings in pages are handled specially, for example
 ;; "* Appointments" and "* Tasks".
@@ -42,7 +45,7 @@
 
 ;;; Code:
 
-(require 'org)
+(require 'org-install)
 (require 'remember)
 
 ;; Org-mouse adds various clickable menus to org-mode constructs.
@@ -51,12 +54,16 @@
 
 ;; I want files with the extension ".org" to open in org-mode.
 
-(add-to-list 'auto-mode-alist '("\\.org$" . org-mode))
-(add-to-list 'auto-mode-alist '("\\.org_archive$" . org-mode))
+(add-to-list 'auto-mode-alist '("\\.\\(org\\|org_archive\\|txt\\)$" . org-mode))
 
 (defvar bin-folder (file-name-as-directory "~/org")
   "The disk directory where bin pages go by default.
 See also `bin-other-pages'.")
+
+(defvar bin-page-regexp "^[[:alnum:]].*\\.org$"
+  "Regular expression used to select page files from the bin folder.
+Requiring an alphanumeric character at the start prevents picking
+up autosave files and such.")
 
 (defvar bin-file "~/org/bin.org" 
   "Filename of the bin file, a central location for incoming unfiled items.
@@ -71,8 +78,9 @@ A page is an org file covering one topic."
 
 (defvar bin-pages '() "The list of current page names.")
 
-(defvar bin-other-pages '() "Association list of pages stored outside the bin folder.
-Each entry is of the form: 
+(defvar bin-other-pages '() 
+"Association list of pages stored outside the bin folder.
+Each entry is of the form:
 
   (PAGENAME . FILENAME)
 
@@ -82,18 +90,25 @@ where both PAGENAME and FILENAME are strings. Example:
         '((\"finance\" . \"~/finance/todo.org\")
           (\"myproject\" . \"~/myproject/myproject.org\")))")
 
-(defun bin-read-pages ()
-  (setf bin-pages 
-	(
+(defun bin-filename-to-pagename (filename)
+  (file-name-sans-extension (file-name-nondirectory filename)))
 
-(defun bin-complete-page-name ()
-  (completing-read bin-pages
+(defun bin-get-pages ()
+  (append (mapcar #'bin-filename-to-pagename
+		  (directory-files bin-folder nil bin-page-regexp))
+	  ;; pull names out of assoc list
+	  (mapcar #'car bin-other-pages)))
 
-(defun bin-find-page (page &optional archive-p)
-  (find-file (bin-page-filename page)))
+(defun bin-rescan-pages ()
+  (setf bin-pages (bin-get-pages)))
+	      
+    
+;; (defun bin-complete-page-name ()
+;;   (completing-read bin-pages
+
+;; (defun bin-find-page (page &optional archive-p)
+;;   (find-file (bin-page-filename page)))
   
-  
-
 ;; I open my bin file when I hit C-c g
 
 (defun bin ()
@@ -113,14 +128,6 @@ where both PAGENAME and FILENAME are strings. Example:
 
 (setq org-todo-keywords '((type "TODO" "NEXT" "WAITING" "DONE")))
 
-;; Some projects need their own org files, but I still want them to
-;; show up in my agenda.
-
-(defvar bin-other-files)
-
-(setf bin-other-files (list "~/eon/eon.org"))
-
-(setf org-agenda-files (cons bin-file bin-other-files))
 
 ;; When I'm using org to track issues in a project, I use these
 ;; keywords on a file-local basis: 
