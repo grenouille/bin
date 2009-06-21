@@ -40,6 +40,8 @@
 ;; Hotkeys and auto-completion speed up access to the bin and its
 ;; pages, including a search tool.
 
+;; foo
+
 ;;; Code:
 
 (require 'org)
