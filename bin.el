@@ -1,6 +1,6 @@
 ;;; bin.el --- dto's catch-all organizational system
 
-;; Copyright (C) 2007  David O'Toole
+;; Copyright (C) 2009  David O'Toole
 
 ;; Author: David O'Toole(require 'org) <dto@gnu.org>
 ;; Keywords: tools
@@ -39,8 +39,6 @@
 
 ;; Hotkeys and auto-completion speed up access to the bin and its
 ;; pages, including a search tool.
-
-;; foo
 
 ;;; Code:
 
